@@ -39,7 +39,7 @@ def speak_text(text: str, rate: int = 150, volume: float = 1.0):
 
 
 # ── PAGE CONFIG ───────────────────────────────────────────────────────────────
-st.set_page_config(page_title="BrailleConnect", page_icon="⠿", layout="wide")
+st.set_page_config(page_title="BrailleVision", page_icon="⠿", layout="wide")
 
 # ── STYLING ───────────────────────────────────────────────────────────────────
 st.markdown("""
@@ -339,7 +339,8 @@ SMOOTH_FRAMES       = st.sidebar.slider("Smoothing Window",    4,  30, 15)
 VOTE_THRESHOLD      = st.sidebar.slider("Vote Threshold %",   40,  90, 65)
 LOCK_FRAMES         = st.sidebar.slider("Lock-in Frames",      3,  15,  6)
 IOU_THRESHOLD       = st.sidebar.slider("NMS IoU Threshold", 0.1, 0.9, 0.35, 0.05)
-CLUSTER_DISTANCE    = st.sidebar.slider("X-Cluster Dist px",   5, 100,  40)
+CLUSTER_DISTANCE    = st.sidebar.slider("X-Cluster Dist px",   5, 100,  25,
+    help="Lower = better for closely spaced letters. Try 20-30 for standard Braille.")
 WORD_GAP_MULTIPLIER = st.sidebar.slider("Word Gap ×",        1.2, 4.0, 2.0, 0.1)
 
 st.sidebar.markdown("---")
@@ -468,21 +469,26 @@ def apply_nms(boxes, confs, labels, iou_thresh):
 
 
 def cluster_x_positions(detections, cluster_dist):
+    """
+    Cluster by X using FIXED ANCHOR (first point), not running mean.
+    Running mean drifts and merges adjacent distinct letters (e.g. L+L in HELLO).
+    """
     if not detections:
         return []
-    clusters = []
+    clusters = []   # each entry: [anchor_x, [xs], [labels], [confs]]
     for x, label, conf in sorted(detections, key=lambda d: d[0]):
         placed = False
         for c in clusters:
-            if abs(x - np.mean(c[0])) < cluster_dist:
-                c[0].append(x); c[1].append(label); c[2].append(conf)
+            if abs(x - c[0]) < cluster_dist:   # fixed anchor comparison
+                c[1].append(x); c[2].append(label); c[3].append(conf)
                 placed = True; break
         if not placed:
-            clusters.append([[x], [label], [conf]])
-    return sorted(
-        [(np.mean(c[0]), c[1][int(np.argmax(c[2]))], c[2][int(np.argmax(c[2]))]) for c in clusters],
-        key=lambda d: d[0]
-    )
+            clusters.append([x, [x], [label], [conf]])
+    result = []
+    for c in clusters:
+        best = int(np.argmax(c[3]))
+        result.append((np.mean(c[1]), c[2][best], c[3][best]))
+    return sorted(result, key=lambda d: d[0])
 
 
 def build_text_with_spaces(voted_chars, box_widths, gap_multiplier):
@@ -508,11 +514,18 @@ def get_stable_text(buffer, vote_thresh_pct, cluster_dist, gap_multiplier):
     for centre_x, _, _ in clustered:
         frame_labels, x1s, x2s = [], [], []
         for frame_dets in buffer:
+            # Use half cluster_dist for vote matching to avoid cross-cluster bleeding
+            best_match = None
+            best_dist  = cluster_dist * 0.6
             for d in frame_dets:
-                if abs(d[0]-centre_x) < cluster_dist:
-                    frame_labels.append(d[1])
-                    if len(d) >= 5: x1s.append(d[3]); x2s.append(d[4])
-                    break
+                dist = abs(d[0] - centre_x)
+                if dist < best_dist:
+                    best_dist  = dist
+                    best_match = d
+            if best_match:
+                frame_labels.append(best_match[1])
+                if len(best_match) >= 5:
+                    x1s.append(best_match[3]); x2s.append(best_match[4])
         if len(frame_labels) >= min_votes:
             majority = Counter(frame_labels).most_common(1)[0][0]
             voted.append((centre_x, majority))
@@ -736,8 +749,13 @@ if st.session_state.running:
             [(d[0], d[1], d[2]) for d in frame_dets], CLUSTER_DISTANCE)
 
         def find_box(cx):
+            # Use tighter match to avoid wrong box being assigned to adjacent letter
+            best, best_dist = None, CLUSTER_DISTANCE * 0.6
             for d in frame_dets:
-                if abs(d[0]-cx) < CLUSTER_DISTANCE: return d[3], d[4]
+                dist = abs(d[0] - cx)
+                if dist < best_dist:
+                    best_dist = dist; best = d
+            if best: return best[3], best[4]
             return cx-20, cx+20
 
         frame_dets_full = [(cx, lbl, conf, *find_box(cx)) for cx, lbl, conf in clustered_frame]
