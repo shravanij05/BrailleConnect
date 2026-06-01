@@ -87,9 +87,8 @@ pip install -r requirements.txt
 ```
 
 For detailed setup instructions, DroidCam configuration, troubleshooting, and camera setup, refer to:
-```md
 📄 [SETUP_INSTRUCTIONS.md](SETUP_INSTRUCTIONS.md)
-```
+
 ---
 ## Running the Application
 
@@ -155,6 +154,7 @@ https://universe.roboflow.com/braille-eitpg/braille-detection-f0rb5
 **Annotation Format:** YOLO
 
 The dataset consists of annotated Braille character images used for training and evaluating the detection model.
+
 ---
 
 ## Project Documentation
