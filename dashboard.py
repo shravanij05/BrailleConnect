@@ -39,7 +39,7 @@ def speak_text(text: str, rate: int = 150, volume: float = 1.0):
 
 
 # ── PAGE CONFIG ───────────────────────────────────────────────────────────────
-st.set_page_config(page_title="BrailleVision", page_icon="⠿", layout="wide")
+st.set_page_config(page_title="BrailleConnect", page_icon="⠿", layout="wide")
 
 # ── STYLING ───────────────────────────────────────────────────────────────────
 st.markdown("""
