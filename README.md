@@ -95,6 +95,7 @@ pip install -r requirements.txt
 For detailed setup instructions, DroidCam configuration, troubleshooting, and camera setup, refer to:
 
 📄 [SETUP_INSTRUCTIONS.md](SETUP_INSTRUCTIONS.md)
+
 For a detailed explanation of the complete project workflow, dataset usage, model training pipeline, detection logic, translation process, and technical architecture, refer to:
 
 📄 [WORKFLOW.md](WORKFLOW.md)
