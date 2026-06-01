@@ -1,12 +1,13 @@
-train: C:/braille_project/train/images
-val: C:/braille_project/valid/images
+train: C:\braille_hybrid_matrix\train\images
+val: C:\braille_hybrid_matrix\valid\images
+test: ../test/images
 
 nc: 26
 names: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
 
 roboflow:
-  workspace: sanikas-workspace-ek1nl
-  project: sanikas-workspace-ek1nl
-  version: dataset
-  license: Private
-  url: https://app.roboflow.com/sanikas-workspace-ek1nl/sanikas-workspace-ek1nl/dataset
+  workspace: braille-eitpg
+  project: braille-detection-f0rb5
+  version: 15
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/braille-eitpg/braille-detection-f0rb5/dataset/15
