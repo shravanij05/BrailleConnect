@@ -53,13 +53,11 @@ Using a mobile phone camera generally provides:
 
 ### Step 1: Install DroidCam
 
-Mobile App:
+**Mobile App:**
+- [DroidCam on Google Play](https://play.google.com/store/apps/details?id=com.dev47apps.droidcam)
 
-:contentReference[oaicite:1]{index=1}
-
-Desktop Client:
-
-:contentReference[oaicite:2]{index=2}
+**Desktop Client:**
+- [DroidCam Official Website](https://www.dev47apps.com/)
 
 ---
 
