@@ -87,6 +87,7 @@ pip install -r requirements.txt
 ```
 
 For detailed setup instructions, DroidCam configuration, troubleshooting, and camera setup, refer to:
+
 📄 [SETUP_INSTRUCTIONS.md](SETUP_INSTRUCTIONS.md)
 
 ---
