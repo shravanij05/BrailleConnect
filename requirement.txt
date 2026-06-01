@@ -4,3 +4,4 @@ ultralytics
 numpy
 joblib
 scikit-learn
+pyttsx3
